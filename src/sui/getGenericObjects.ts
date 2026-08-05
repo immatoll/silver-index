@@ -8,6 +8,7 @@ export interface ChainObject {
   entityKey: string;
   type: string;
   data: any;
+  version: number;
 }
 
 const QUERY = `
@@ -27,6 +28,7 @@ const QUERY = `
 
             nodes {
                 address
+                version
                 asMoveObject {
                     contents {
                         json
@@ -71,7 +73,7 @@ export async function readGenericObjects(
 
       if (!id || !data) continue;
 
-      objects.push({ id, entityKey: entity.key, type: entity.type, data });
+      objects.push({ id, entityKey: entity.key, type: entity.type, data, version: Number(node.version) });
     }
 
     console.log(

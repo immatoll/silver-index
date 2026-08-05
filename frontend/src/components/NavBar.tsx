@@ -5,7 +5,7 @@ export default function NavBar() {
         <header className="header">
             <div className="brand">
                 <span className="brand-name">
-                    Silver<span className="brand-name-accent">Link</span> Indexer
+                    Silver<span className="brand-name-accent">Index</span>
                 </span>
                 <span className="brand-tag">EVE Frontier Data Control</span>
             </div>

@@ -27,6 +27,7 @@ export interface ChainObjectRow {
     entity_key: string;
     type: string;
     data_json: string;
+    version: number;
     updated_at: number;
 }
 
@@ -53,12 +54,14 @@ export interface SyncProgress {
     running: boolean;
     mode: string | null;
     kind: "objects" | "events" | null;
+    phase: "fetching" | "saving" | null;
     entityIndex: number;
     entityTotal: number;
     entityKey: string | null;
     entityLabel: string | null;
     page: number;
     itemsFound: number;
+    savedCount: number;
     startedAt: number | null;
     updatedAt: number | null;
     error: string | null;

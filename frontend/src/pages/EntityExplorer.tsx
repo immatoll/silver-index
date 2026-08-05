@@ -7,8 +7,9 @@ import {
     fetchEntities
 } from "../api";
 import type { Catalog, ChainEventRow, ChainObjectRow, EntityCatalog, EntityInfo } from "../api";
+import { MODULES } from "../functions";
 
-type Tab = "objects" | "events";
+type Tab = "objects" | "events" | "functions";
 type Row = ChainObjectRow | ChainEventRow;
 
 interface EntityExplorerProps {
@@ -208,6 +209,10 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
 
+    const modules = useMemo(() => MODULES.filter((m) => m.catalog === catalog), [catalog]);
+    const [selectedModule, setSelectedModule] = useState<string | null>(null);
+    const activeModule = modules.find((m) => m.module === selectedModule) ?? null;
+
     useEffect(() => {
         let cancelled = false;
 
@@ -233,7 +238,7 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
         };
     }, [catalog]);
 
-    const list = tab === "objects" ? entityCatalog.objects : entityCatalog.events;
+    const list = tab === "objects" ? entityCatalog.objects : tab === "events" ? entityCatalog.events : [];
 
     useEffect(() => {
         setSelected(null);
@@ -241,7 +246,8 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
         setSelectedRow(null);
         setSearchInput("");
         setSearch("");
-    }, [tab]);
+        setSelectedModule(modules[0]?.module ?? null);
+    }, [tab, modules]);
 
     function select(entity: EntityInfo) {
         setSelected(entity);
@@ -288,6 +294,17 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
         []
     );
 
+    const filteredFunctions = useMemo(() => {
+        if (!activeModule) return [];
+
+        const term = search.trim().toLowerCase();
+        if (!term) return activeModule.functions;
+
+        return activeModule.functions.filter(
+            (fn) => fn.name.toLowerCase().includes(term) || fn.doc.toLowerCase().includes(term)
+        );
+    }, [activeModule, search]);
+
     return (
         <section className="panel data-panel world-data-panel">
             <h2>{title}</h2>
@@ -306,75 +323,146 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
                 >
                     EVENTS
                 </button>
+
+                <button
+                    className={tab === "functions" ? "tab-btn tab-btn--active" : "tab-btn"}
+                    onClick={() => setTab("functions")}
+                >
+                    FUNCTIONS
+                </button>
             </div>
 
-            <div className="world-data-layout">
-                <div className="entity-list">
-                    {loadingCatalog ? (
-                        <div className="loading-panel">
-                            <div className="spinner" />
-                        </div>
-                    ) : (
-                        list.map((entity) => (
+            {tab === "functions" ? (
+                <div className="world-data-layout">
+                    <div className="entity-list">
+                        {modules.map((mod) => (
                             <button
-                                key={entity.key}
+                                key={mod.module}
                                 className={
-                                    selected?.key === entity.key
+                                    activeModule?.module === mod.module
                                         ? "entity-row entity-row--active"
                                         : "entity-row"
                                 }
-                                onClick={() => select(entity)}
+                                onClick={() => {
+                                    setSelectedModule(mod.module);
+                                    setSearchInput("");
+                                }}
                             >
-                                <span>{entity.label}</span>
-                                <span className="entity-count">{entity.count}</span>
+                                <span>{mod.module}</span>
+                                <span className="entity-count">{mod.functions.length}</span>
                             </button>
-                        ))
-                    )}
+                        ))}
+                    </div>
+
+                    <div className="entity-main">
+                        {activeModule && (
+                            <>
+                                <p className="function-module-doc">{activeModule.doc}</p>
+
+                                <input
+                                    className="search"
+                                    placeholder={`Search ${activeModule.module} functions...`}
+                                    value={searchInput}
+                                    onChange={(e) => setSearchInput(e.target.value)}
+                                />
+                            </>
+                        )}
+
+                        <div className="function-list">
+                            {!activeModule ? (
+                                <div className="loading-panel">
+                                    <p>No modules in this catalog.</p>
+                                </div>
+                            ) : filteredFunctions.length === 0 ? (
+                                <div className="loading-panel">
+                                    <p>No functions match "{searchInput}".</p>
+                                </div>
+                            ) : (
+                                filteredFunctions.map((fn) => (
+                                    <div className="function-card" key={fn.name}>
+                                        <div className="function-sig">
+                                            <span className="function-name">{fn.name}</span>
+                                            <span className="function-params">{fn.signature}</span>
+                                            {fn.returns && (
+                                                <span className="function-returns"> : {fn.returns}</span>
+                                            )}
+                                        </div>
+                                        <p className="function-doc">{fn.doc}</p>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
-
-                <div className="entity-main">
-                    {selected && (
-                        <input
-                            className="search"
-                            placeholder={`Search ${selected.label.toLowerCase()}...`}
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                        />
-                    )}
-
-                    <div className="entity-grid">
-                        {!selected ? (
-                            <div className="loading-panel">
-                                <p>Select an entity to view indexed data.</p>
-                            </div>
-                        ) : loadingRows ? (
+            ) : (
+                <div className="world-data-layout">
+                    <div className="entity-list">
+                        {loadingCatalog ? (
                             <div className="loading-panel">
                                 <div className="spinner" />
                             </div>
                         ) : (
-                            <DataGrid
-                                rows={filteredRows}
-                                columns={columns as GridColDef[]}
-                                getRowId={getRowId}
-                                rowHeight={38}
-                                density="compact"
-                                disableColumnMenu
-                                onRowClick={(params: GridRowParams<Row>) =>
-                                    setSelectedRow(params.row)
-                                }
-                                initialState={{
-                                    pagination: {
-                                        paginationModel: { pageSize: 100 }
+                            list.map((entity) => (
+                                <button
+                                    key={entity.key}
+                                    className={
+                                        selected?.key === entity.key
+                                            ? "entity-row entity-row--active"
+                                            : "entity-row"
                                     }
-                                }}
-                                pageSizeOptions={[100]}
-                            />
+                                    onClick={() => select(entity)}
+                                >
+                                    <span>{entity.label}</span>
+                                    <span className="entity-count">{entity.count}</span>
+                                </button>
+                            ))
                         )}
                     </div>
 
-                    {selected && <EntityDetails row={selectedRow} />}
+                    <div className="entity-main">
+                        {selected && (
+                            <input
+                                className="search"
+                                placeholder={`Search ${selected.label.toLowerCase()}...`}
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                            />
+                        )}
+
+                        <div className="entity-grid">
+                            {!selected ? (
+                                <div className="loading-panel">
+                                    <p>Select an entity to view indexed data.</p>
+                                </div>
+                            ) : loadingRows ? (
+                                <div className="loading-panel">
+                                    <div className="spinner" />
+                                </div>
+                            ) : (
+                                <DataGrid
+                                    rows={filteredRows}
+                                    columns={columns as GridColDef[]}
+                                    getRowId={getRowId}
+                                    rowHeight={38}
+                                    density="compact"
+                                    disableColumnMenu
+                                    onRowClick={(params: GridRowParams<Row>) =>
+                                        setSelectedRow(params.row)
+                                    }
+                                    initialState={{
+                                        pagination: {
+                                            paginationModel: { pageSize: 100 }
+                                        }
+                                    }}
+                                    pageSizeOptions={[100]}
+                                />
+                            )}
+                        </div>
+
+                        {selected && <EntityDetails row={selectedRow} />}
+                    </div>
                 </div>
-            </div>
+            )}
         </section>
     );
 }

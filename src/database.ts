@@ -52,12 +52,23 @@ export function initDatabase() {
     db.exec(`DELETE FROM sync_state WHERE key LIKE 'event_%';`);
   }
 
+  // `version` (the object's on-chain Lamport version) was added after
+  // chain_objects already existed for some databases — backfill the column
+  // so old rows don't break the NOT NULL constraint on re-create.
+  const chainObjectsInfo = db.prepare("PRAGMA table_info(chain_objects)").all() as any[];
+  const hasVersion = chainObjectsInfo.some((col) => col.name === "version");
+
+  if (chainObjectsInfo.length > 0 && !hasVersion) {
+    db.exec(`ALTER TABLE chain_objects ADD COLUMN version INTEGER NOT NULL DEFAULT 0;`);
+  }
+
   db.exec(`
         CREATE TABLE IF NOT EXISTS chain_objects (
             id TEXT PRIMARY KEY,
             entity_key TEXT NOT NULL,
             type TEXT NOT NULL,
             data_json TEXT,
+            version INTEGER NOT NULL DEFAULT 0,
             updated_at INTEGER NOT NULL
         );
 
@@ -88,6 +99,7 @@ export function saveChainObject(object: any) {
             entity_key,
             type,
             data_json,
+            version,
             updated_at
         )
         VALUES (
@@ -95,6 +107,7 @@ export function saveChainObject(object: any) {
             @entityKey,
             @type,
             @data,
+            @version,
             @updatedAt
         )
         ON CONFLICT(id)
@@ -102,6 +115,7 @@ export function saveChainObject(object: any) {
             entity_key = excluded.entity_key,
             type = excluded.type,
             data_json = excluded.data_json,
+            version = excluded.version,
             updated_at = excluded.updated_at
     `,
   ).run({
@@ -109,6 +123,7 @@ export function saveChainObject(object: any) {
     entityKey: object.entityKey,
     type: object.type,
     data: JSON.stringify(object.data ?? null),
+    version: object.version ?? 0,
     updatedAt: Date.now(),
   });
 }

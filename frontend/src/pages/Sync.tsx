@@ -6,12 +6,14 @@ const EMPTY_PROGRESS: SyncProgress = {
     running: false,
     mode: null,
     kind: null,
+    phase: null,
     entityIndex: 0,
     entityTotal: 0,
     entityKey: null,
     entityLabel: null,
     page: 0,
     itemsFound: 0,
+    savedCount: 0,
     startedAt: null,
     updatedAt: null,
     error: null
@@ -74,6 +76,11 @@ export default function SyncPage() {
             return;
         }
 
+        // The backend logs "started" synchronously before the sync begins,
+        // but logs are otherwise only refreshed on load/60s/finish — refetch
+        // now so the "started" line shows up right away instead of only
+        // appearing together with "finished" once the sync completes.
+        setLogs(await fetchLogs());
         await pollProgress();
     }
 
@@ -108,22 +115,22 @@ export default function SyncPage() {
 
                     <div className="stats">
                         <div>
-                            <label>WORLD OBJECTS</label>
+                            <label>WORLD<br />OBJECTS</label>
                             <strong>{status.worldObjects}</strong>
                         </div>
 
                         <div>
-                            <label>WORLD EVENTS</label>
+                            <label>WORLD<br />EVENTS</label>
                             <strong>{status.worldEvents}</strong>
                         </div>
 
                         <div>
-                            <label>SILVER LINK OBJECTS</label>
+                            <label>SILVERLINK<br />OBJECTS</label>
                             <strong>{status.silverlinkObjects}</strong>
                         </div>
 
                         <div>
-                            <label>SILVER LINK EVENTS</label>
+                            <label>SILVERLINK<br />EVENTS</label>
                             <strong>{status.silverlinkEvents}</strong>
                         </div>
                     </div>
@@ -154,7 +161,13 @@ export default function SyncPage() {
 
             {(progress.running || progress.error) && (
                 <section className="panel sync-progress-panel">
-                    <h2>{progress.running ? "SYNC IN PROGRESS" : "LAST SYNC FAILED"}</h2>
+                    <h2>
+                        {progress.running
+                            ? progress.phase === "saving"
+                                ? "SAVING TO DATABASE"
+                                : "SYNC IN PROGRESS"
+                            : "LAST SYNC FAILED"}
+                    </h2>
 
                     {progress.error ? (
                         <p className="sync-error">{progress.error}</p>
@@ -171,8 +184,14 @@ export default function SyncPage() {
                                 <span>{progress.mode}</span>
                                 <span>{entityProgressLabel}</span>
                                 <span>{progress.entityLabel ?? "-"}</span>
-                                <span>Page {progress.page}</span>
-                                <span>{progress.itemsFound} found</span>
+                                {progress.phase === "saving" ? (
+                                    <span>Saving to DB — {progress.savedCount} / {progress.itemsFound}</span>
+                                ) : (
+                                    <>
+                                        <span>Page {progress.page}</span>
+                                        <span>{progress.itemsFound} found</span>
+                                    </>
+                                )}
                                 <span>Elapsed {formatElapsed(progress.startedAt)}</span>
                             </div>
                         </>

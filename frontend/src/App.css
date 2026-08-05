@@ -808,6 +808,60 @@ pre {
   width: 100%;
 }
 
+/* ============ FUNCTION LIBRARY ============ */
+
+.function-module-doc {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.function-list {
+  flex: 1 1 60%;
+  min-height: 120px;
+  border: 1px solid var(--line);
+  overflow-y: auto;
+  background: var(--input);
+}
+
+.function-card {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.function-card:last-child {
+  border-bottom: none;
+}
+
+.function-sig {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.function-name {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.function-params {
+  color: var(--text-dim);
+}
+
+.function-returns {
+  color: var(--text-faint);
+}
+
+.function-doc {
+  margin: 4px 0 0;
+  color: var(--text-dim);
+  font-family: "Chakra Petch", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 /* ============ ENTITY DETAILS (structured JSON view) ============ */
 
 .entity-details {
