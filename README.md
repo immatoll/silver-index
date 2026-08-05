@@ -17,6 +17,12 @@ Data is split into two catalogs, shown as separate tabs in the frontend:
 
 Indexed objects also carry the on-chain `version` field (Sui's Lamport-clock-based per-object version counter), so when the same logical entity has multiple candidate objects (e.g. a wallet's old vs. new Character), the one with the highest `version` is the current one.
 
+### Function library
+
+The **Functions** tab (in each catalog's Entity Explorer) is a searchable, per-module reference of the contracts' callable Move functions — signature, return type, and a short description for each. It's scoped to state-changing/action functions (anything taking `&mut`, a `TxContext`, or creating/consuming objects) and intentionally excludes pure getters and `public(package)` internals, so it stays a usable "what can I call" reference rather than a full API dump.
+
+It's hand-maintained in [`frontend/src/functions.ts`](frontend/src/functions.ts), transcribed from the Move source in the sibling `civ-control/vendor/world-contracts` (World) and `silver-link/move` (Silver Link) repos — not auto-generated, so it needs a manual pass whenever those contracts change.
+
 ## Requirements
 
 - Node.js 18+
