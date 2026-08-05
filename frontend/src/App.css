@@ -1,0 +1,930 @@
+@import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root {
+  --void: #0d0e0f;
+  --panel: #121314;
+  --panel-dim: #121314;
+  --input: #17181a;
+
+  --line: #1e1e1e;
+  --line-soft: rgba(255, 255, 255, 0.04);
+  --line-strong: #333333;
+
+  --amber: #ff9640;
+  --amber-strong: #ffbd7a;
+  --amber-soft: rgba(255, 150, 64, 0.42);
+  --accent-dim: rgba(255, 150, 64, 0.14);
+
+  --cyan: #5fd67f;
+
+  --text: #c7c7c7;
+  --text-dim: #8c8c8c;
+  --text-faint: #5c5c5c;
+
+  --radius: 2px;
+  --radius-sm: 2px;
+
+  background: var(--void);
+  color: var(--text);
+  font-family:
+    "Chakra Petch",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--void);
+  /* Faint technical grid + a soft glow from the top — same texture as
+       silver-link's HUD background, kept neutral with a touch of the
+       amber/green accent instead of pure white. */
+  background-image:
+    radial-gradient(
+      ellipse 1100px 640px at 50% -12%,
+      rgba(255, 150, 64, 0.05),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 1200px 800px at 90% 100%,
+      rgba(95, 214, 127, 0.035),
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.01) 1px,
+      transparent 1px,
+      transparent 36px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.01) 1px,
+      transparent 1px,
+      transparent 36px
+    );
+  background-repeat: no-repeat, no-repeat, repeat, repeat;
+  background-attachment: fixed;
+  overflow: -moz-scrollbars-vertical;
+  overflow-y: scroll;
+}
+
+::selection {
+  background: var(--amber);
+  color: #0a0a0a;
+}
+
+:focus-visible {
+  outline: 1px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* Thin, dark, accent-on-hover scrollbars — the default light OS
+   scrollbar reads jarring against this palette. */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-line);
+  background-clip: padding-box;
+}
+
+* {
+  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-width: thin;
+}
+
+/* ============ APP SHELL ============ */
+
+.app {
+  min-height: 100vh;
+  padding: 40px clamp(20px, 4vw, 56px);
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* ============ HEADER ============
+   Boxed topbar (border + radius + panel fill), matching silver-link's
+   `.topbar` — not a bare bottom-border strip. */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+  padding: 14px 22px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-name {
+  color: var(--text);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.brand-name-accent {
+  color: var(--amber);
+}
+
+.brand-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ============ TAGS / STATUS PILL ============ */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.tag--green {
+  border-color: rgba(95, 214, 127, 0.45);
+  color: var(--cyan);
+  background: rgba(95, 214, 127, 0.1);
+}
+
+.tag--green .dot {
+  background: var(--cyan);
+  box-shadow: 0 0 5px 1px rgba(95, 214, 127, 0.5);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 5px 1px var(--amber-soft);
+  animation: pulse 2.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ============ NAV ============
+   Bordered "step" buttons, same language as silver-link's topbar nav
+   buttons, instead of underline tabs. */
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.step.nav-link {
+  padding: 7px 14px;
+  color: var(--text-dim);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--input);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.step.nav-link:hover {
+  color: var(--text);
+  border-color: var(--amber-soft);
+}
+
+.step.nav-link.nav-link--active {
+  color: var(--amber-strong);
+  border-color: var(--amber-soft);
+  background: var(--accent-dim);
+}
+
+/* ============ PANELS ============ */
+
+.panel {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.panel > h2,
+.panel > .search,
+.panel > pre,
+.panel > .stats,
+.panel > button,
+.panel > .MuiTabs-root {
+  margin-left: 22px;
+  margin-right: 22px;
+}
+
+.panel > h2 ~ .search,
+.panel > h2 ~ pre,
+.panel > h2 ~ .stats,
+.panel > h2 ~ button,
+.panel > h2 ~ .MuiTabs-root,
+.panel > h2 ~ .world-data-tabs,
+.panel > h2 ~ .world-data-layout,
+.panel > h2 ~ .grid-container,
+.panel > h2 ~ .loading-panel {
+  margin-top: 16px;
+}
+
+.panel > h2 {
+  margin-left: 0;
+  margin-right: 0;
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel > button:last-of-type,
+.panel > .stats {
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+h2 {
+  margin: 0 0 18px;
+  font-family: "Chakra Petch", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+/* ============ STATUS STATS ============ */
+
+.stats {
+  display: flex;
+  gap: 48px;
+}
+
+.stats label {
+  display: block;
+  color: var(--text-faint);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+}
+
+.stats strong {
+  display: block;
+  margin-top: 8px;
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 34px;
+  color: var(--text);
+}
+
+/* ============ BUTTONS ============ */
+
+button {
+  display: block;
+  width: calc(100% - 44px);
+  margin: 0 22px 10px;
+  padding: 11px 14px;
+  background: var(--input);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--amber);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+button:hover {
+  border-color: var(--amber-soft);
+  color: var(--amber-strong);
+  background: #151515;
+}
+
+button:active {
+  background: var(--accent-dim);
+}
+
+button:disabled {
+  border-color: var(--line);
+  color: var(--text-dim);
+  background: transparent;
+  cursor: not-allowed;
+}
+
+/* ============ SYNC PROGRESS ============ */
+
+.sync-notice {
+  margin: 16px 22px 12px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 92, 92, 0.4);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 92, 92, 0.08);
+  color: #ff8f8f;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px;
+}
+
+.sync-progress-panel {
+  margin-top: 18px;
+  padding-bottom: 20px;
+}
+
+.sync-progress-bar-track {
+  margin: 16px 22px 14px;
+  height: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: #050608;
+  overflow: hidden;
+}
+
+.sync-progress-bar-fill {
+  height: 100%;
+  background: var(--amber);
+  box-shadow: 0 0 6px 0 var(--amber-soft);
+  transition: width 0.3s ease;
+}
+
+.sync-progress-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 22px 20px;
+  color: var(--text-dim);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.sync-progress-meta span:first-child {
+  color: var(--amber);
+}
+
+.sync-error {
+  margin: 16px 22px 20px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 92, 92, 0.4);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 92, 92, 0.08);
+  color: #ff8f8f;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+}
+
+/* ============ LOG PANEL ============ */
+
+.log-panel {
+  margin-top: 18px;
+  padding-bottom: 20px;
+}
+
+pre {
+  height: 300px;
+  overflow: auto;
+  margin: 0 22px !important;
+  padding: 14px 16px;
+  background: var(--panel-dim);
+  border: 1px solid var(--line);
+  color: var(--cyan);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ============ DATA EXPLORER ============ */
+
+.data-panel {
+  margin-top: 18px;
+  padding-bottom: 22px;
+}
+
+.data-panel .MuiTabs-root {
+  min-height: 36px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+.data-panel .MuiTab-root {
+  min-width: 120px;
+  min-height: 36px;
+  padding: 0;
+  color: var(--text-dim);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: none;
+}
+
+.data-panel .Mui-selected {
+  color: var(--amber) !important;
+}
+
+.data-panel .MuiTabs-indicator {
+  background-color: var(--amber);
+  height: 1.5px;
+}
+
+/* SEARCH */
+
+.search {
+  display: block;
+  width: calc(100% - 44px);
+  margin: 0 22px 14px;
+  padding: 10px 12px;
+  background: var(--input);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12.5px;
+}
+
+.search::placeholder {
+  color: var(--text-faint);
+}
+
+.search:focus {
+  outline: none;
+  border-color: var(--amber-soft);
+}
+
+/* DATAGRID (virtualized — handles thousands of rows without lag) */
+
+.grid-container {
+  margin: 0 22px 4px;
+  width: calc(100% - 44px);
+}
+
+.data-panel .MuiDataGrid-root {
+  height: 72vh;
+  background: #050608;
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12.5px;
+  /* MUI X DataGrid v9's actual theming-token names — not the older,
+     unprefixed `--DataGrid-*` names (those silently no-op on this
+     version). */
+  --DataGrid-t-color-border-base: rgba(255, 255, 255, 0.045);
+  --DataGrid-t-header-background-base: var(--input);
+  --DataGrid-t-color-background-overlay: #050608;
+  --DataGrid-t-color-background-base: #050608;
+}
+
+.data-panel .MuiDataGrid-columnHeader,
+.data-panel .MuiDataGrid-columnHeaders {
+  background: var(--input);
+}
+
+.data-panel .MuiDataGrid-columnHeaders {
+  border-bottom: 1px solid var(--line);
+}
+
+.data-panel .MuiDataGrid-columnHeaderTitle {
+  color: var(--text-dim);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 1.5px;
+}
+
+.data-panel .MuiDataGrid-cell {
+  color: #a9b1bc;
+}
+
+.data-panel .MuiDataGrid-cell:focus,
+.data-panel .MuiDataGrid-cell:focus-within,
+.data-panel .MuiDataGrid-columnHeader:focus,
+.data-panel .MuiDataGrid-columnHeader:focus-within {
+  outline: 1px solid var(--amber-soft) !important;
+}
+
+.data-panel .MuiDataGrid-row:hover {
+  background: rgba(95, 214, 127, 0.045);
+}
+
+.data-panel .MuiDataGrid-footerContainer {
+  background: var(--input);
+  border-top: 1px solid var(--line);
+}
+
+.data-panel .MuiTablePagination-root {
+  color: var(--text-dim);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12.5px;
+}
+
+.data-panel .MuiIconButton-root {
+  color: var(--text-dim);
+}
+
+.data-panel .MuiIconButton-root:hover {
+  color: var(--amber);
+}
+
+.data-panel .MuiDataGrid-virtualScroller::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+.data-panel .MuiDataGrid-virtualScroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.data-panel .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.data-panel .MuiDataGrid-virtualScroller::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-line);
+  background-clip: padding-box;
+}
+
+/* LOADING */
+
+.loading-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 300px;
+  margin: 0 22px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text-dim);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--amber);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============ WORLD DATA EXPLORER ============ */
+
+.world-data-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 22px 14px;
+}
+
+.tab-btn {
+  display: block;
+  width: auto;
+  margin: 0;
+  padding: 7px 16px;
+  background: var(--input);
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.tab-btn--active {
+  color: var(--amber);
+  border-color: var(--amber-soft);
+}
+
+/* The panel fills exactly what's left below the topbar instead of using
+   raw vh units on its children — those ignored the topbar's real height
+   (padding + brand lockup + its margin-bottom) and overflowed the window.
+   180px = .app's top+bottom padding (80px) + topbar's rendered height
+   including its margin-bottom (~100px). Everything below flexes to fit
+   inside that instead of guessing further offsets. */
+.world-data-panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 180px);
+  max-height: calc(100vh - 180px);
+}
+
+.world-data-panel .world-data-layout {
+  flex: 1;
+  min-height: 0;
+}
+
+.world-data-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 10px;
+  margin: 0 22px 20px;
+}
+
+.entity-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background: var(--input);
+  border: 1px solid var(--line);
+}
+
+.entity-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.entity-main .search {
+  width: 100%;
+  margin: 0;
+}
+
+.entity-row {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text-dim);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+
+.entity-row:hover {
+  color: var(--text);
+  background: rgba(255, 150, 64, 0.05);
+}
+
+.entity-row--active {
+  color: var(--amber);
+  background: rgba(255, 150, 64, 0.08);
+}
+
+.entity-count {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.entity-row--active .entity-count {
+  color: var(--amber-soft);
+}
+
+.entity-grid {
+  flex: 1 1 60%;
+  min-height: 120px;
+  border: 1px solid var(--line);
+  overflow: auto;
+}
+
+.entity-grid .MuiDataGrid-root {
+  height: 100%;
+  border: none;
+  background: var(--input);
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  cursor: pointer;
+  --DataGrid-t-header-background-base: var(--input);
+}
+
+.entity-grid .MuiDataGrid-columnHeader,
+.entity-grid .MuiDataGrid-columnHeaders {
+  background: var(--input);
+}
+
+.entity-grid .MuiDataGrid-footerContainer {
+  background: var(--input);
+  border-top: 1px solid var(--line);
+}
+
+.entity-grid .MuiDataGrid-row.Mui-selected,
+.entity-grid .MuiDataGrid-row.Mui-selected:hover {
+  background: rgba(255, 150, 64, 0.1);
+}
+
+.entity-grid .loading-panel {
+  height: 100%;
+  margin: 0;
+  border: none;
+}
+
+.world-data-panel .grid-container {
+  margin: 0;
+  width: 100%;
+}
+
+/* ============ ENTITY DETAILS (structured JSON view) ============ */
+
+.entity-details {
+  flex: 1 1 40%;
+  border: 1px solid var(--line);
+  background: var(--input);
+  min-height: 100px;
+  overflow: auto;
+}
+
+.entity-details--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+}
+
+.entity-details-header {
+  position: sticky;
+  top: 0;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--input);
+  color: var(--amber);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  word-break: break-all;
+}
+
+.entity-details-empty {
+  padding: 14px;
+  margin: 0;
+  color: var(--text-faint);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+}
+
+.json-tree {
+  padding: 10px 14px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.json-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.json-key {
+  flex: 0 0 auto;
+  color: var(--text-dim);
+}
+
+.json-key::after {
+  content: ":";
+  color: var(--text-faint);
+}
+
+.json-value-inline {
+  min-width: 0;
+  word-break: break-all;
+}
+
+.json-value-block {
+  flex: 1 1 100%;
+}
+
+.json-string {
+  color: var(--cyan);
+}
+
+.json-number {
+  color: var(--amber);
+}
+
+.json-boolean {
+  color: var(--amber-strong);
+}
+
+.json-null,
+.json-empty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* ============ RESPONSIVE ============ */
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+  }
+
+  .stats {
+    gap: 28px;
+  }
+}
+
+/* ============ MOTION SAFETY ============ */
+
+@media (prefers-reduced-motion: reduce) {
+  .status .dot {
+    animation: none;
+  }
+}

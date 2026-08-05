@@ -1,0 +1,33 @@
+{
+  "name": "silver-index",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n api,frontend -c blue,magenta \"npm:api\" \"npm:frontend\"",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "api": "tsx src/api/server.ts",
+    "frontend": "npm run dev --prefix frontend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@mysten/sui": "^2.23.1",
+    "@protobuf-ts/grpc-transport": "^2.11.1",
+    "better-sqlite3": "^13.0.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.2",
+    "concurrently": "^10.0.4",
+    "tsx": "^4.23.1",
+    "typescript": "^6.0.3"
+  }
+}
