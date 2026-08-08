@@ -14,6 +14,10 @@ export interface ChainEvent {
   data: any;
   createdAt: string;
   cursor: string | null;
+  gasComputationCost: string | null;
+  gasStorageCost: string | null;
+  gasStorageRebate: string | null;
+  gasNonRefundableStorageFee: string | null;
 }
 
 interface GenericEventScanResponse {
@@ -30,6 +34,16 @@ interface GenericEventScanResponse {
       } | null;
       transaction: {
         digest: string;
+        effects?: {
+          gasEffects?: {
+            gasSummary?: {
+              computationCost: string;
+              storageCost: string;
+              storageRebate: string;
+              nonRefundableStorageFee: string;
+            } | null;
+          } | null;
+        } | null;
       };
     }[];
   };
@@ -60,6 +74,17 @@ const QUERY = `
 
                 transaction {
                     digest
+
+                    effects {
+                        gasEffects {
+                            gasSummary {
+                                computationCost
+                                storageCost
+                                storageRebate
+                                nonRefundableStorageFee
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -103,6 +128,8 @@ export async function readGenericEvents(
 
       if (!json) continue;
 
+      const gasSummary = node.transaction.effects?.gasEffects?.gasSummary;
+
       events.push({
         digest: node.transaction.digest,
         sequenceNumber: Number(node.sequenceNumber),
@@ -111,6 +138,10 @@ export async function readGenericEvents(
         data: json,
         createdAt: node.timestamp,
         cursor: data.pageInfo.endCursor ?? "",
+        gasComputationCost: gasSummary?.computationCost ?? null,
+        gasStorageCost: gasSummary?.storageCost ?? null,
+        gasStorageRebate: gasSummary?.storageRebate ?? null,
+        gasNonRefundableStorageFee: gasSummary?.nonRefundableStorageFee ?? null,
       });
     }
 

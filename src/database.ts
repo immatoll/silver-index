@@ -52,6 +52,20 @@ export function initDatabase() {
     db.exec(`DELETE FROM sync_state WHERE key LIKE 'event_%';`);
   }
 
+  // Gas cost columns were added after chain_events already existed for some
+  // databases — backfill so old rows don't break re-syncs.
+  const chainEventsInfo2 = db.prepare("PRAGMA table_info(chain_events)").all() as any[];
+  const hasGasCost = chainEventsInfo2.some((col) => col.name === "gas_computation_cost");
+
+  if (chainEventsInfo2.length > 0 && !hasGasCost) {
+    db.exec(`
+        ALTER TABLE chain_events ADD COLUMN gas_computation_cost TEXT;
+        ALTER TABLE chain_events ADD COLUMN gas_storage_cost TEXT;
+        ALTER TABLE chain_events ADD COLUMN gas_storage_rebate TEXT;
+        ALTER TABLE chain_events ADD COLUMN gas_non_refundable_storage_fee TEXT;
+    `);
+  }
+
   // `version` (the object's on-chain Lamport version) was added after
   // chain_objects already existed for some databases — backfill the column
   // so old rows don't break the NOT NULL constraint on re-create.
@@ -82,6 +96,10 @@ export function initDatabase() {
             type TEXT NOT NULL,
             data_json TEXT,
             created_at TEXT NOT NULL,
+            gas_computation_cost TEXT,
+            gas_storage_cost TEXT,
+            gas_storage_rebate TEXT,
+            gas_non_refundable_storage_fee TEXT,
             PRIMARY KEY (digest, sequence_number)
         );
 
@@ -137,7 +155,11 @@ export function saveChainEvent(event: any) {
             entity_key,
             type,
             data_json,
-            created_at
+            created_at,
+            gas_computation_cost,
+            gas_storage_cost,
+            gas_storage_rebate,
+            gas_non_refundable_storage_fee
         )
         VALUES (
             @digest,
@@ -145,7 +167,11 @@ export function saveChainEvent(event: any) {
             @entityKey,
             @type,
             @data,
-            @createdAt
+            @createdAt,
+            @gasComputationCost,
+            @gasStorageCost,
+            @gasStorageRebate,
+            @gasNonRefundableStorageFee
         )
         ON CONFLICT(digest, sequence_number)
         DO NOTHING
@@ -157,6 +183,10 @@ export function saveChainEvent(event: any) {
     type: event.type,
     data: JSON.stringify(event.data ?? null),
     createdAt: event.createdAt,
+    gasComputationCost: event.gasComputationCost ?? null,
+    gasStorageCost: event.gasStorageCost ?? null,
+    gasStorageRebate: event.gasStorageRebate ?? null,
+    gasNonRefundableStorageFee: event.gasNonRefundableStorageFee ?? null,
   });
 }
 
