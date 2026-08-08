@@ -11,6 +11,24 @@ export interface ChainObject {
   version: number;
 }
 
+interface GenericObjectScanResponse {
+  objects: {
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
+    nodes: {
+      address: string;
+      version: string;
+      asMoveObject?: {
+        contents?: {
+          json: unknown;
+        } | null;
+      } | null;
+    }[];
+  };
+}
+
 const QUERY = `
     query GenericObjectScan(
         $type: String!,
@@ -53,7 +71,10 @@ export async function readGenericObjects(
   while (true) {
     page++;
 
-    const result = await graphql.query({
+    const result: {
+  data?: GenericObjectScanResponse;
+  errors?: unknown;
+} = await graphql.query<GenericObjectScanResponse>({
       query: QUERY,
       variables: {
         type: entity.type,
@@ -65,7 +86,11 @@ export async function readGenericObjects(
       throw new Error(JSON.stringify(result.errors));
     }
 
-    const page_ = result.data.objects;
+    if (!result.data) {
+      throw new Error("GraphQL returned no data");
+    }
+
+ const page_ = result.data!.objects;
 
     for (const node of page_.nodes) {
       const id = node.address;
@@ -73,7 +98,13 @@ export async function readGenericObjects(
 
       if (!id || !data) continue;
 
-      objects.push({ id, entityKey: entity.key, type: entity.type, data, version: Number(node.version) });
+      objects.push({
+        id,
+        entityKey: entity.key,
+        type: entity.type,
+        data,
+        version: Number(node.version),
+      });
     }
 
     console.log(
@@ -84,7 +115,7 @@ export async function readGenericObjects(
 
     if (!page_.pageInfo.hasNextPage) break;
 
-    cursor = page_.pageInfo.endCursor;
+    cursor = page_.pageInfo.endCursor ?? null;
   }
 
   console.log(`Finished object scan (${entity.key}): ${objects.length} found`);

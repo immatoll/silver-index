@@ -42,41 +42,96 @@ function ssuType(struct: string): string {
  */
 export const OBJECT_TYPES: EntityDef[] = [
   // ----- world -----
-  { key: "admin_acl", type: worldType("access", "AdminACL"), label: "Admin ACL", catalog: "world" },
+  {
+    key: "admin_acl",
+    type: worldType("access", "AdminACL"),
+    label: "Admin ACL",
+    catalog: "world",
+  },
   {
     key: "server_address_registry",
     type: worldType("access", "ServerAddressRegistry"),
     label: "Server Address Registry",
     catalog: "world",
   },
-  { key: "assembly", type: worldType("assembly", "Assembly"), label: "Assembly", catalog: "world" },
-  { key: "gate_config", type: worldType("gate", "GateConfig"), label: "Gate Config", catalog: "world" },
-  { key: "gate", type: worldType("gate", "Gate"), label: "Gate", catalog: "world" },
-  { key: "jump_permit", type: worldType("gate", "JumpPermit"), label: "Jump Permit", catalog: "world" },
+  {
+    key: "assembly",
+    type: worldType("assembly", "Assembly"),
+    label: "Assembly",
+    catalog: "world",
+  },
+  {
+    key: "gate_config",
+    type: worldType("gate", "GateConfig"),
+    label: "Gate Config",
+    catalog: "world",
+  },
+  {
+    key: "gate",
+    type: worldType("gate", "Gate"),
+    label: "Gate",
+    catalog: "world",
+  },
+  {
+    key: "jump_permit",
+    type: worldType("gate", "JumpPermit"),
+    label: "Jump Permit",
+    catalog: "world",
+  },
   {
     key: "storage_unit",
     type: worldType("storage_unit", "StorageUnit"),
     label: "Storage Unit",
     catalog: "world",
   },
-  { key: "turret", type: worldType("turret", "Turret"), label: "Turret", catalog: "world" },
-  { key: "character", type: worldType("character", "Character"), label: "Character", catalog: "world" },
+  {
+    key: "turret",
+    type: worldType("turret", "Turret"),
+    label: "Turret",
+    catalog: "world",
+  },
+  {
+    key: "character",
+    type: worldType("character", "Character"),
+    label: "Character",
+    catalog: "world",
+  },
   {
     key: "player_profile",
     type: worldType("character", "PlayerProfile"),
     label: "Player Profile",
     catalog: "world",
   },
-  { key: "killmail", type: worldType("killmail", "Killmail"), label: "Killmail", catalog: "world" },
+  {
+    key: "killmail",
+    type: worldType("killmail", "Killmail"),
+    label: "Killmail",
+    catalog: "world",
+  },
   {
     key: "network_node",
     type: worldType("network_node", "NetworkNode"),
     label: "Network Node",
     catalog: "world",
   },
-  { key: "energy_config", type: worldType("energy", "EnergyConfig"), label: "Energy Config", catalog: "world" },
-  { key: "fuel_config", type: worldType("fuel", "FuelConfig"), label: "Fuel Config", catalog: "world" },
-  { key: "item", type: worldType("inventory", "Item"), label: "Item (in transit)", catalog: "world" },
+  {
+    key: "energy_config",
+    type: worldType("energy", "EnergyConfig"),
+    label: "Energy Config",
+    catalog: "world",
+  },
+  {
+    key: "fuel_config",
+    type: worldType("fuel", "FuelConfig"),
+    label: "Fuel Config",
+    catalog: "world",
+  },
+  {
+    key: "item",
+    type: worldType("inventory", "Item"),
+    label: "Item (in transit)",
+    catalog: "world",
+  },
   {
     key: "location_registry",
     type: worldType("location", "LocationRegistry"),
@@ -95,8 +150,18 @@ export const OBJECT_TYPES: EntityDef[] = [
     label: "Object Registry",
     catalog: "world",
   },
-  { key: "rift", type: worldType("rift", "Rift"), label: "Rift", catalog: "world" },
-  { key: "governor_cap", type: worldType("world", "GovernorCap"), label: "Governor Cap", catalog: "world" },
+  {
+    key: "rift",
+    type: worldType("rift", "Rift"),
+    label: "Rift",
+    catalog: "world",
+  },
+  {
+    key: "governor_cap",
+    type: worldType("world", "GovernorCap"),
+    label: "Governor Cap",
+    catalog: "world",
+  },
 
   // ----- silverlink -----
   {
@@ -139,10 +204,30 @@ export const EVENT_TYPES: EntityDef[] = [
     label: "Extension Config Frozen",
     catalog: "world",
   },
-  { key: "gate_created", type: worldType("gate", "GateCreatedEvent"), label: "Gate Created", catalog: "world" },
-  { key: "gate_linked", type: worldType("gate", "GateLinkedEvent"), label: "Gate Linked", catalog: "world" },
-  { key: "gate_unlinked", type: worldType("gate", "GateUnlinkedEvent"), label: "Gate Unlinked", catalog: "world" },
-  { key: "jump", type: worldType("gate", "JumpEvent"), label: "Jump", catalog: "world" },
+  {
+    key: "gate_created",
+    type: worldType("gate", "GateCreatedEvent"),
+    label: "Gate Created",
+    catalog: "world",
+  },
+  {
+    key: "gate_linked",
+    type: worldType("gate", "GateLinkedEvent"),
+    label: "Gate Linked",
+    catalog: "world",
+  },
+  {
+    key: "gate_unlinked",
+    type: worldType("gate", "GateUnlinkedEvent"),
+    label: "Gate Unlinked",
+    catalog: "world",
+  },
+  {
+    key: "jump",
+    type: worldType("gate", "JumpEvent"),
+    label: "Jump",
+    catalog: "world",
+  },
   {
     key: "jump_permit_issued",
     type: worldType("gate", "JumpPermitIssuedEvent"),
@@ -179,7 +264,12 @@ export const EVENT_TYPES: EntityDef[] = [
     label: "Storage Unit Extension Revoked",
     catalog: "world",
   },
-  { key: "turret_created", type: worldType("turret", "TurretCreatedEvent"), label: "Turret Created", catalog: "world" },
+  {
+    key: "turret_created",
+    type: worldType("turret", "TurretCreatedEvent"),
+    label: "Turret Created",
+    catalog: "world",
+  },
   {
     key: "priority_list_updated",
     type: worldType("turret", "PriorityListUpdatedEvent"),
@@ -282,7 +372,12 @@ export const EVENT_TYPES: EntityDef[] = [
     label: "Status Changed",
     catalog: "world",
   },
-  { key: "rift_spawned", type: worldType("rift", "RiftSpawnedEvent"), label: "Rift Spawned", catalog: "world" },
+  {
+    key: "rift_spawned",
+    type: worldType("rift", "RiftSpawnedEvent"),
+    label: "Rift Spawned",
+    catalog: "world",
+  },
   {
     key: "rift_location_broadcast",
     type: worldType("rift", "RiftLocationBroadcastEvent"),

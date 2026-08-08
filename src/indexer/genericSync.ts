@@ -1,5 +1,15 @@
-import { getSyncState, saveChainObject, saveChainEvent, setSyncState } from "../database.js";
-import { OBJECT_TYPES, EVENT_TYPES, type Catalog, type EntityDef } from "../entities.js";
+import {
+  getSyncState,
+  saveChainObject,
+  saveChainEvent,
+  setSyncState,
+} from "../database.js";
+import {
+  OBJECT_TYPES,
+  EVENT_TYPES,
+  type Catalog,
+  type EntityDef,
+} from "../entities.js";
 import { readGenericObjects } from "../sui/getGenericObjects.js";
 import { readGenericEvents } from "../sui/getGenericEvents.js";
 import {
@@ -85,8 +95,10 @@ export async function syncEvents(catalog: Catalog) {
 
       const cursor = getSyncState(eventSyncStateKey(entity));
 
-      const events = await readGenericEvents(entity, cursor, (page, itemsFound) =>
-        updatePage(page, itemsFound),
+      const events = await readGenericEvents(
+        entity,
+        cursor,
+        (page, itemsFound) => updatePage(page, itemsFound),
       );
 
       console.log(`Saving ${events.length} events (${entity.key})`);
@@ -106,7 +118,11 @@ export async function syncEvents(catalog: Catalog) {
       updateSaving(events.length);
 
       if (events.length) {
-        setSyncState(eventSyncStateKey(entity), events[events.length - 1].cursor);
+        const cursor = events[events.length - 1].cursor;
+
+        if (cursor) {
+          setSyncState(eventSyncStateKey(entity), cursor);
+        }
       }
     }
 

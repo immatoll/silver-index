@@ -13,7 +13,26 @@ export interface ChainEvent {
   type: string;
   data: any;
   createdAt: string;
-  cursor: string;
+  cursor: string | null;
+}
+
+interface GenericEventScanResponse {
+  events: {
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
+    nodes: {
+      timestamp: string;
+      sequenceNumber: string;
+      contents?: {
+        json: unknown;
+      } | null;
+      transaction: {
+        digest: string;
+      };
+    }[];
+  };
 }
 
 const QUERY = `
@@ -61,7 +80,7 @@ export async function readGenericEvents(
   while (true) {
     page++;
 
-    const response = await graphql.query({
+    const response = await graphql.query<GenericEventScanResponse>({
       query: QUERY,
       variables: {
         type: entity.type,
@@ -71,6 +90,10 @@ export async function readGenericEvents(
 
     if (response.errors) {
       throw new Error(JSON.stringify(response.errors));
+    }
+
+    if (!response.data) {
+      throw new Error("GraphQL returned no data.");
     }
 
     const data = response.data.events;
@@ -87,7 +110,7 @@ export async function readGenericEvents(
         type: entity.type,
         data: json,
         createdAt: node.timestamp,
-        cursor: data.pageInfo.endCursor,
+        cursor: data.pageInfo.endCursor ?? "",
       });
     }
 
