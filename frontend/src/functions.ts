@@ -293,4 +293,21 @@ export const MODULES: ModuleDef[] = [
             { name: "put_many", signature: "(storage_unit: &mut StorageUnit, character: &Character, owner_cap: &OwnerCap<Character>, type_ids: vector<u64>, quantities: vector<u32>, ctx: &mut TxContext)", doc: "Batch version of put() for multiple type_ids/quantities in one call." },
         ],
     },
+    {
+        module: "silver_location::silver_location",
+        doc: "On-chain encrypted location + per-assembly allowlist (Seal identity-based encryption) — generic over the assembly type T (any type with a world::access::OwnerCap<T>; the app only ever instantiates <NetworkNode>). Owner is always permanently allowed to decrypt, independent of the allowlist. Sharing is address-based (list) OR tribe-based (whitelisted_tribe_ids) — no separate Private/Public/Tribe mode.",
+        catalog: "silverlink",
+        functions: [
+            { name: "create", signature: "<T: key>(assembly: &T, owner_cap: &OwnerCap<T>, owner_address: address, ciphertext: vector<u8>, initial_members: vector<address>, initial_whitelisted_tribe_ids: vector<u32>, ctx: &mut TxContext)", returns: "ID", doc: "Owner: creates the allowlist for an assembly, with its encrypted location and initial sharing (addresses + tribe ids) set in the same call." },
+            { name: "set_location", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, ciphertext: vector<u8>, ctx: &mut TxContext)", doc: "Owner: updates the stored encrypted location. An empty ciphertext deletes the stored location without touching sharing." },
+            { name: "add_members", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, members: vector<address>, ctx: &mut TxContext)", doc: "Owner: adds one or more addresses to the allowlist." },
+            { name: "remove_members", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, members: vector<address>, ctx: &mut TxContext)", doc: "Owner: removes one or more addresses from the allowlist." },
+            { name: "set_members", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, members: vector<address>, ctx: &mut TxContext)", doc: "Owner: replaces the address list only, leaving whitelisted_tribe_ids untouched." },
+            { name: "add_whitelisted_tribes", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, tribe_ids: vector<u32>, ctx: &mut TxContext)", doc: "Owner: adds one or more tribe ids to the whitelist." },
+            { name: "remove_whitelisted_tribes", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, tribe_ids: vector<u32>, ctx: &mut TxContext)", doc: "Owner: removes one or more tribe ids from the whitelist." },
+            { name: "set_whitelist", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, members: vector<address>, tribe_ids: vector<u32>, ctx: &mut TxContext)", doc: "Owner: replaces both the address list and tribe whitelist in one call (full desired state)." },
+            { name: "seal_approve", signature: "<T>(id: vector<u8>, allowlist: &LocationAllowlist<T>, ctx: &TxContext)", doc: "Seal key servers dry-run this to check decrypt access via owner or direct address membership only (no tribe check). Aborts on failure." },
+            { name: "seal_approve_tribe", signature: "<T>(id: vector<u8>, allowlist: &LocationAllowlist<T>, character: &Character, ctx: &TxContext)", doc: "Same as seal_approve, but also grants access via tribe membership — verifies character is owned by the caller before checking its tribe against the whitelist." },
+        ],
+    },
 ];

@@ -14,6 +14,11 @@
   --amber-strong: #ffbd7a;
   --amber-soft: rgba(255, 150, 64, 0.42);
   --accent-dim: rgba(255, 150, 64, 0.14);
+  /* Alias — some rules reference --accent-line directly rather than
+     --amber-soft; keep both names pointing at the same value instead of
+     leaving --accent-line undefined (was previously unset, silently
+     falling through to `background: transparent` wherever it was used). */
+  --accent-line: var(--amber-soft);
 
   --cyan: #5fd67f;
 
@@ -33,6 +38,69 @@
     -apple-system,
     sans-serif;
   font-variant-numeric: tabular-nums;
+}
+
+/* Dev/debug-only "light mode" — same spirit as silver-link's own toggle
+   (states/theme.ts): deliberately loud and far from the real dark HUD
+   palette above, so it's unmistakable at a glance that this isn't the
+   shipped look. Toggled via NavBar's theme button, sets
+   data-theme="light" on <html>. Only covers colors actually driven by
+   these CSS variables — the ~20 hardcoded hex values elsewhere in this
+   file (status colors, a couple of borders) intentionally stay dark-only
+   for now, same debug-tool tradeoff silver-link made. */
+:root[data-theme="light"] {
+  --void: #f2f0ff;
+  --panel: #ffffff;
+  --panel-dim: #ffffff;
+  --input: #f6f6f6;
+
+  --line: #c2c2c2;
+  --line-soft: rgba(0, 0, 0, 0.04);
+  --line-strong: #424242;
+
+  --amber: #ff8000;
+  --amber-strong: #ff8000;
+  --amber-soft: rgba(255, 128, 0, 0.5);
+  --accent-dim: #ffdbb8;
+  --accent-line: var(--amber-soft);
+
+  --cyan: #0a8f4a;
+
+  --text: #202020;
+  --text-dim: #404040;
+  --text-faint: #a0a0a0;
+
+  background: var(--void);
+  color: var(--text);
+}
+
+:root[data-theme="light"] body {
+  background: var(--void);
+  background-image:
+    radial-gradient(
+      ellipse 1100px 640px at 50% -12%,
+      rgba(255, 45, 120, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 1200px 800px at 90% 100%,
+      rgba(124, 58, 237, 0.09),
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      rgba(0, 0, 0, 0.012) 1px,
+      transparent 1px,
+      transparent 36px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      rgba(0, 0, 0, 0.012) 1px,
+      transparent 1px,
+      transparent 36px
+    );
 }
 
 * {
@@ -253,6 +321,34 @@ body {
   background: var(--accent-dim);
 }
 
+/* Dev-only theme toggle — same bordered-pill language as .step.nav-link,
+   standalone since this is a <button> outside the nav-link family. See
+   states/theme.ts; deliberately plain rather than trying to look like a
+   real feature. */
+.theme-toggle {
+  padding: 7px 14px;
+  min-width: 0px;
+  color: var(--text-dim);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--input);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--amber-soft);
+}
+
 /* ============ PANELS ============ */
 
 .panel {
@@ -340,7 +436,7 @@ h2 {
 
 button {
   display: block;
-  width: calc(100% - 44px);
+  min-width: calc(100% - 44px);
   margin: 0 22px 10px;
   padding: 11px 14px;
   background: var(--input);
@@ -646,12 +742,13 @@ pre {
 .world-data-tabs {
   display: flex;
   gap: 4px;
-  margin: 0 22px 14px;
+  margin: 0 22px 0;
 }
 
 .tab-btn {
   display: block;
   width: auto;
+  min-width: 0;
   margin: 0;
   padding: 7px 16px;
   background: var(--input);
@@ -765,7 +862,7 @@ pre {
 }
 
 .entity-grid {
-  flex: 1 1 60%;
+  flex: 1 1 40%;
   min-height: 120px;
   border: 1px solid var(--line);
   overflow: auto;
@@ -865,7 +962,7 @@ pre {
 /* ============ ENTITY DETAILS (structured JSON view) ============ */
 
 .entity-details {
-  flex: 1 1 40%;
+  flex: 1 1 60%;
   border: 1px solid var(--line);
   background: var(--input);
   min-height: 100px;
@@ -912,7 +1009,7 @@ pre {
 .json-row {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 2px;
   flex-wrap: wrap;
 }
 

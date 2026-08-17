@@ -34,8 +34,15 @@ function tick(): Promise<void> {
   return new Promise((resolve) => setImmediate(resolve));
 }
 
+// Scoped by `entity.type`, not just `entity.key` — the key is stable
+// across a package republish, but a stored cursor is an opaque pointer
+// into that *specific* GraphQL `events(filter: { type })` result set.
+// Reusing an old cursor against a new type filter (post-republish, once
+// SLV_LOCATION_PACKAGE_ID etc. changes) returns an empty page rather than
+// erroring, so the sync silently "succeeds" with 0 new events forever.
+// Including the type means a republish naturally starts a fresh scan.
 function eventSyncStateKey(entity: EntityDef): string {
-  return `event_${entity.key}`;
+  return `event_${entity.key}:${entity.type}`;
 }
 
 export async function syncObjects(catalog: Catalog) {

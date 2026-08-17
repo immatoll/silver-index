@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
+import { ThemeToggle } from "./components/ThemeToggle";
 import SyncPage from "./pages/Sync";
 import EntityExplorer from "./pages/EntityExplorer";
 import "./App.css";
@@ -22,6 +23,8 @@ export default function App() {
                     />
                 </Routes>
             </main>
+
+            <ThemeToggle />
         </BrowserRouter>
     );
 }

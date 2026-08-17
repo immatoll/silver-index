@@ -12,5 +12,8 @@ export const SLV_SSU_PACKAGE_ID = "0xc2b4a3860039ee9093187b4ab83cd04a116de5e4028
 export const SLV_GATE_MODULE = "silver_gate";
 export const SLV_GATE_PACKAGE_ID = "0xd148ab33aabc536b1c7ca1dc3591ae38d7aa3919e7ba498a1ccba02731f9292a";
 
+export const SLV_LOCATION_MODULE = "silver_location";
+export const SLV_LOCATION_PACKAGE_ID = "0x3932625a88d41740fb642ef9438829d3e2258484013907c608fdca8a84f65106";
+
 
 

@@ -3,7 +3,7 @@
 Orientation for anyone (human or agent) working in this codebase. This is
 an indexer + explorer for on-chain data from EVE Frontier's `world`
 package and SilverLink's own extension packages (`silver_gate`,
-`silver_ssu`). It's a Node/TypeScript backend (Express API + a
+`silver_ssu`, `silver_location`). It's a Node/TypeScript backend (Express API + a
 better-sqlite3-backed indexer) with a small React frontend for browsing
 the indexed data. See [`README.md`](README.md) for the user-facing
 overview — this file is for how the pieces fit together and gotchas

@@ -6,6 +6,12 @@ import {
 } from "@mui/material/styles";
 
 import App from "./App.tsx";
+import { applyStoredTheme } from "./states/theme";
+
+// Applied synchronously before the first render (direct DOM mutation, not
+// a React effect) so there's no flash of the wrong theme on load — same
+// approach silver-link's own light-mode toggle uses.
+applyStoredTheme();
 
 
 const theme = createTheme({

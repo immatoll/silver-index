@@ -1,7 +1,7 @@
 
 # Silver Index
 
-An indexer and explorer for on-chain data from the [EVE Frontier](https://evefrontier.com/) Sui world contract and SilverLink's own extension packages (`silver_gate`, `silver_ssu`).
+An indexer and explorer for on-chain data from the [EVE Frontier](https://evefrontier.com/) Sui world contract and SilverLink's own extension packages (`silver_gate`, `silver_ssu`, `silver_location`).
 
 It walks the Sui GraphQL RPC for every known object and event type, stores the raw JSON in a local SQLite database, and serves it through a small API and React frontend so you can browse objects, events, and sync progress without writing GraphQL by hand.
 ## How it works
@@ -46,6 +46,8 @@ Configuration is read from environment variables (see [`src/config.ts`](src/conf
 | `SLV_GATE_PACKAGE_ID` | Silver Gate extension package ID |
 | `SLV_SSU_MODULE` | `shared` |
 | `SLV_GATE_MODULE` | `silver_gate` |
+| `SLV_LOCATION_PACKAGE_ID` | Silver Location extension package ID |
+| `SLV_LOCATION_MODULE` | `silver_location` |
 
 Copy these into a `.env` file if you need to override any of them (e.g. to point at a different network or package deployment).
 

@@ -1,6 +1,8 @@
 import {
   SLV_GATE_MODULE,
   SLV_GATE_PACKAGE_ID,
+  SLV_LOCATION_MODULE,
+  SLV_LOCATION_PACKAGE_ID,
   SLV_SSU_MODULE,
   SLV_SSU_PACKAGE_ID,
   WORLD_PACKAGE_ID,
@@ -29,6 +31,10 @@ function gateType(struct: string): string {
 
 function ssuType(struct: string): string {
   return `${SLV_SSU_PACKAGE_ID}::${SLV_SSU_MODULE}::${struct}`;
+}
+
+function locationType(struct: string): string {
+  return `${SLV_LOCATION_PACKAGE_ID}::${SLV_LOCATION_MODULE}::${struct}`;
 }
 
 /**
@@ -174,6 +180,17 @@ export const OBJECT_TYPES: EntityDef[] = [
     key: "silver_ssu_config",
     type: ssuType("SilverSSUConfig"),
     label: "Silver SSU Config",
+    catalog: "silverlink",
+  },
+  {
+    // Generic over the assembly type (`silver_location::LocationAllowlist<T>`
+    // — any type with a `world::access::OwnerCap<T>`); the only concrete
+    // instantiation the app currently creates is `<NetworkNode>`, so that's
+    // what's indexed here. If a future assembly kind gets its own location
+    // allowlist, add a second entry with that type argument.
+    key: "silver_location_allowlist_network_node",
+    type: `${locationType("LocationAllowlist")}<${worldType("network_node", "NetworkNode")}>`,
+    label: "Location Allowlist (Network Node)",
     catalog: "silverlink",
   },
 ];
@@ -426,6 +443,15 @@ export const EVENT_TYPES: EntityDef[] = [
     key: "ssu_whitelist",
     type: ssuType("SSUWhitelistEvent"),
     label: "SSU Whitelist Changed",
+    catalog: "silverlink",
+  },
+  {
+    // Non-generic (the event struct itself carries no type parameter, even
+    // though the allowlist it describes is generic) — one event type
+    // covers every assembly kind's location allowlist activity.
+    key: "location_allowlist_event",
+    type: locationType("LocationAllowlistEvent"),
+    label: "Location Allowlist Changed",
     catalog: "silverlink",
   },
 ];
