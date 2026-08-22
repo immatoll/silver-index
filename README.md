@@ -1,7 +1,7 @@
 
 # Silver Index
 
-An indexer and explorer for on-chain data from the [EVE Frontier](https://evefrontier.com/) Sui world contract and SilverLink's own extension packages (`silver_gate`, `silver_ssu`, `silver_location`).
+An indexer and explorer for on-chain data from the [EVE Frontier](https://evefrontier.com/) Sui world contract and SilverLink's own extension packages (`silver_gate`, `silver_ssu`, `silver_location`, `silver_toll`).
 
 It walks the Sui GraphQL RPC for every known object and event type, stores the raw JSON in a local SQLite database, and serves it through a small API and React frontend so you can browse objects, events, and sync progress without writing GraphQL by hand.
 ## How it works
@@ -21,7 +21,7 @@ Indexed objects also carry the on-chain `version` field (Sui's Lamport-clock-bas
 
 The **Functions** tab (in each catalog's Entity Explorer) is a searchable, per-module reference of the contracts' callable Move functions — signature, return type, and a short description for each. It's scoped to state-changing/action functions (anything taking `&mut`, a `TxContext`, or creating/consuming objects) and intentionally excludes pure getters and `public(package)` internals, so it stays a usable "what can I call" reference rather than a full API dump.
 
-It's hand-maintained in [`frontend/src/functions.ts`](frontend/src/functions.ts), transcribed from the Move source in the sibling `civ-control/vendor/world-contracts` (World) and `silver-link/move` (Silver Link) repos — not auto-generated, so it needs a manual pass whenever those contracts change.
+It's hand-maintained in [`frontend/src/functions.ts`](frontend/src/functions.ts), transcribed from the Move source in the sibling `civ-control/vendor/world-contracts` (World) and `silver-link/move` (Silver Link, including `silver_toll`) repos — not auto-generated, so it needs a manual pass whenever those contracts change.
 
 ## Requirements
 
@@ -48,6 +48,8 @@ Configuration is read from environment variables (see [`src/config.ts`](src/conf
 | `SLV_GATE_MODULE` | `silver_gate` |
 | `SLV_LOCATION_PACKAGE_ID` | Silver Location extension package ID |
 | `SLV_LOCATION_MODULE` | `silver_location` |
+| `SLV_TOLL_PACKAGE_ID` | Silver Toll extension package ID |
+| `SLV_TOLL_MODULE` | `silver_toll` |
 
 Copy these into a `.env` file if you need to override any of them (e.g. to point at a different network or package deployment).
 

@@ -5,6 +5,8 @@ import {
   SLV_LOCATION_PACKAGE_ID,
   SLV_SSU_MODULE,
   SLV_SSU_PACKAGE_ID,
+  SLV_TOLL_MODULE,
+  SLV_TOLL_PACKAGE_ID,
   WORLD_PACKAGE_ID,
 } from "./config.js";
 
@@ -35,6 +37,10 @@ function ssuType(struct: string): string {
 
 function locationType(struct: string): string {
   return `${SLV_LOCATION_PACKAGE_ID}::${SLV_LOCATION_MODULE}::${struct}`;
+}
+
+function tollType(struct: string): string {
+  return `${SLV_TOLL_PACKAGE_ID}::${SLV_TOLL_MODULE}::${struct}`;
 }
 
 /**
@@ -191,6 +197,12 @@ export const OBJECT_TYPES: EntityDef[] = [
     key: "silver_location_allowlist_network_node",
     type: `${locationType("LocationAllowlist")}<${worldType("network_node", "NetworkNode")}>`,
     label: "Location Allowlist (Network Node)",
+    catalog: "silverlink",
+  },
+  {
+    key: "silver_toll_config",
+    type: tollType("SilverTollConfig"),
+    label: "Silver Toll Config",
     catalog: "silverlink",
   },
 ];
@@ -452,6 +464,24 @@ export const EVENT_TYPES: EntityDef[] = [
     key: "location_allowlist_event",
     type: locationType("LocationAllowlistEvent"),
     label: "Location Allowlist Changed",
+    catalog: "silverlink",
+  },
+  {
+    key: "silver_toll_config_event",
+    type: tollType("SilverTollConfigEvent"),
+    label: "Silver Toll Config Changed",
+    catalog: "silverlink",
+  },
+  {
+    key: "silver_toll_rate_event",
+    type: tollType("SilverTollRateEvent"),
+    label: "Silver Toll Rate Changed",
+    catalog: "silverlink",
+  },
+  {
+    key: "silver_toll_payment_event",
+    type: tollType("SilverTollPaymentEvent"),
+    label: "Silver Toll Payment",
     catalog: "silverlink",
   },
 ];

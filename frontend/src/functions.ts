@@ -26,8 +26,9 @@ export interface ModuleDef {
  * package-private helpers are intentionally omitted — this is a library of things you'd
  * actually call from a script or PTB, not a full API dump.
  *
- * Source: civ-control/vendor/world-contracts/contracts/world (World), silver-link/move/silver_gate
- * and silver-link/move/silver_ssu (Silver Link). Keep in sync manually when those contracts change.
+ * Source: civ-control/vendor/world-contracts/contracts/world (World), silver-link/move/silver_gate,
+ * silver-link/move/silver_ssu, silver-link/move/silver_location, and silver-link/move/silver_toll
+ * (Silver Link). Keep in sync manually when those contracts change.
  */
 export const MODULES: ModuleDef[] = [
     // ================= World =================
@@ -308,6 +309,20 @@ export const MODULES: ModuleDef[] = [
             { name: "set_whitelist", signature: "<T: key>(assembly: &T, allowlist: &mut LocationAllowlist<T>, owner_cap: &OwnerCap<T>, members: vector<address>, tribe_ids: vector<u32>, ctx: &mut TxContext)", doc: "Owner: replaces both the address list and tribe whitelist in one call (full desired state)." },
             { name: "seal_approve", signature: "<T>(id: vector<u8>, allowlist: &LocationAllowlist<T>, ctx: &TxContext)", doc: "Seal key servers dry-run this to check decrypt access via owner or direct address membership only (no tribe check). Aborts on failure." },
             { name: "seal_approve_tribe", signature: "<T>(id: vector<u8>, allowlist: &LocationAllowlist<T>, character: &Character, ctx: &TxContext)", doc: "Same as seal_approve, but also grants access via tribe membership — verifies character is owned by the caller before checking its tribe against the whitelist." },
+        ],
+    },
+    {
+        module: "silver_toll::silver_toll",
+        doc: "Tolling/taxing primitive: a player enables a toll service for their character, sets a default EVE amount, and can override it per tribe or per character (character override wins over tribe, tribe wins over default; the owner is never charged). Standalone — not wired into silver_gate or any other extension; pay_toll is meant to be called voluntarily by a frontend.",
+        catalog: "silverlink",
+        functions: [
+            { name: "create", signature: "(owner_character: &Character, ctx: &mut TxContext)", returns: "ID", doc: "Owner: enables the toll service for owner_character. Defaults to 0 EVE with no overrides. The &Character reference itself is the proof of control — no separate capability." },
+            { name: "set_default_amount", signature: "(config: &mut SilverTollConfig, owner_character: &Character, amount: u64, ctx: &mut TxContext)", doc: "Owner: sets the default toll amount charged to anyone without a more specific override." },
+            { name: "set_tribe_amount", signature: "(config: &mut SilverTollConfig, owner_character: &Character, tribe_id: u32, amount: u64, ctx: &mut TxContext)", doc: "Owner: sets (or replaces) the toll amount for an entire tribe." },
+            { name: "remove_tribe_amount", signature: "(config: &mut SilverTollConfig, owner_character: &Character, tribe_id: u32, ctx: &mut TxContext)", doc: "Owner: removes a tribe's toll override; that tribe falls back to the default." },
+            { name: "set_character_amount", signature: "(config: &mut SilverTollConfig, owner_character: &Character, character_id: ID, amount: u64, ctx: &mut TxContext)", doc: "Owner: sets (or replaces) the toll amount for a specific character — the highest-priority override, winning over both tribe and default." },
+            { name: "remove_character_amount", signature: "(config: &mut SilverTollConfig, owner_character: &Character, character_id: ID, ctx: &mut TxContext)", doc: "Owner: removes a character's toll override; that character falls back to their tribe amount (or the default)." },
+            { name: "pay_toll", signature: "(config: &SilverTollConfig, payer: &Character, payment: Coin<EVE>)", doc: "Pays the toll owed by payer according to config's current rates, transferring the EVE coin directly to the config owner's wallet. Payment must exactly match toll_amount(config, payer), including a zero-value coin when the resolved amount is 0 (e.g. for the owner)." },
         ],
     },
 ];
