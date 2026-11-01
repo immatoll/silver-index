@@ -14,6 +14,8 @@ export interface EntityInfo {
     type: string;
     label: string;
     catalog: Catalog;
+    technical?: boolean;
+    groups?: string[];
     count: number;
 }
 
@@ -93,6 +95,7 @@ export async function fetchChainEvents(entity: string): Promise<ChainEventRow[]>
 
 export type SyncType =
     | "world-objects"
+    | "world-technical-objects"
     | "world-events"
     | "silverlink-objects"
     | "silverlink-events";

@@ -209,7 +209,11 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
 
-    const modules = useMemo(() => MODULES.filter((m) => m.catalog === catalog), [catalog]);
+    const modules = useMemo(
+        () =>
+            MODULES.filter((m) => m.catalog === catalog).sort((a, b) => a.module.localeCompare(b.module)),
+        [catalog]
+    );
     const [selectedModule, setSelectedModule] = useState<string | null>(null);
     const activeModule = modules.find((m) => m.module === selectedModule) ?? null;
 
@@ -238,7 +242,34 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
         };
     }, [catalog]);
 
-    const list = tab === "objects" ? entityCatalog.objects : tab === "events" ? entityCatalog.events : [];
+    // Sections of the entity list: game vs technical objects, or events
+    // grouped by origin (an event with several origins shows up in each).
+    const sections = useMemo(() => {
+        const byLabel = (a: EntityInfo, b: EntityInfo) => a.label.localeCompare(b.label);
+
+        if (tab === "objects") {
+            return [
+                { title: "GAME OBJECTS", items: entityCatalog.objects.filter((e) => !e.technical).sort(byLabel) },
+                { title: "TECHNICAL", items: entityCatalog.objects.filter((e) => e.technical).sort(byLabel) }
+            ].filter((section) => section.items.length > 0);
+        }
+
+        if (tab === "events") {
+            const groups = new Map<string, EntityInfo[]>();
+
+            for (const event of entityCatalog.events) {
+                for (const group of event.groups?.length ? event.groups : ["Other"]) {
+                    groups.set(group, [...(groups.get(group) ?? []), event]);
+                }
+            }
+
+            return [...groups.entries()]
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([title, items]) => ({ title: title.toUpperCase(), items: items.sort(byLabel) }));
+        }
+
+        return [];
+    }, [tab, entityCatalog]);
 
     useEffect(() => {
         setSelected(null);
@@ -294,16 +325,19 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
         []
     );
 
+    const sortedFunctions = useMemo(
+        () => (activeModule ? [...activeModule.functions].sort((a, b) => a.name.localeCompare(b.name)) : []),
+        [activeModule]
+    );
+
     const filteredFunctions = useMemo(() => {
-        if (!activeModule) return [];
-
         const term = search.trim().toLowerCase();
-        if (!term) return activeModule.functions;
+        if (!term) return sortedFunctions;
 
-        return activeModule.functions.filter(
+        return sortedFunctions.filter(
             (fn) => fn.name.toLowerCase().includes(term) || fn.doc.toLowerCase().includes(term)
         );
-    }, [activeModule, search]);
+    }, [sortedFunctions, search]);
 
     return (
         <section className="panel data-panel world-data-panel">
@@ -386,8 +420,26 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
                                             {fn.returns && (
                                                 <span className="function-returns"> : {fn.returns}</span>
                                             )}
+                                            {fn.signature.includes("AdminACL") && (
+                                                <span
+                                                    className="tag tag--admin"
+                                                    title="Requires an AdminACL reference — not callable from an ordinary player wallet/PTB. Restricted to the sponsor/admin server (e.g. bridging in-game actions like character creation or assembly dismantling on-chain)."
+                                                >
+                                                    admin only
+                                                </span>
+                                            )}
                                         </div>
                                         <p className="function-doc">{fn.doc}</p>
+                                        {fn.emits && fn.emits.length > 0 && (
+                                            <div className="function-emits">
+                                                <span className="function-emits-label">emits</span>
+                                                {fn.emits.map((event) => (
+                                                    <span className="tag tag--event" key={event}>
+                                                        {event}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 ))
                             )}
@@ -402,19 +454,25 @@ export default function EntityExplorer({ catalog, title }: EntityExplorerProps) 
                                 <div className="spinner" />
                             </div>
                         ) : (
-                            list.map((entity) => (
-                                <button
-                                    key={entity.key}
-                                    className={
-                                        selected?.key === entity.key
-                                            ? "entity-row entity-row--active"
-                                            : "entity-row"
-                                    }
-                                    onClick={() => select(entity)}
-                                >
-                                    <span>{entity.label}</span>
-                                    <span className="entity-count">{entity.count}</span>
-                                </button>
+                            sections.map((section) => (
+                                <div className="entity-section" key={section.title}>
+                                    <div className="entity-section-title">{section.title}</div>
+
+                                    {section.items.map((entity) => (
+                                        <button
+                                            key={entity.key}
+                                            className={
+                                                selected?.key === entity.key
+                                                    ? "entity-row entity-row--active"
+                                                    : "entity-row"
+                                            }
+                                            onClick={() => select(entity)}
+                                        >
+                                            <span>{entity.label}</span>
+                                            <span className="entity-count">{entity.count}</span>
+                                        </button>
+                                    ))}
+                                </div>
                             ))
                         )}
                     </div>

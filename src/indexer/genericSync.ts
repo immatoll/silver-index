@@ -9,9 +9,10 @@ import {
   EVENT_TYPES,
   type Catalog,
   type EntityDef,
+  type ObjectScope,
 } from "../entities.js";
 import { readGenericObjects } from "../sui/getGenericObjects.js";
-import { readGenericEvents } from "../sui/getGenericEvents.js";
+import { readGenericEvents, type ChainEvent } from "../sui/getGenericEvents.js";
 import {
   startSync,
   startEntity,
@@ -45,18 +46,27 @@ function eventSyncStateKey(entity: EntityDef): string {
   return `event_${entity.key}:${entity.type}`;
 }
 
-export async function syncObjects(catalog: Catalog) {
-  console.log(`Starting object sync (${catalog})`);
+export async function syncObjects(catalog: Catalog, scope: ObjectScope = "game") {
+  const label = scope === "technical" ? `${catalog}-technical-objects` : `${catalog}-objects`;
 
-  const entities = OBJECT_TYPES.filter((e) => e.catalog === catalog);
+  console.log(`Starting object sync (${label})`);
 
-  startSync(`${catalog}-objects`, "objects", entities.length);
+  const entities = OBJECT_TYPES.filter(
+    (e) => e.catalog === catalog && !!e.technical === (scope === "technical"),
+  );
+
+  startSync(label, "objects", entities.length);
 
   try {
     for (let i = 0; i < entities.length; i++) {
       const entity = entities[i];
 
       startEntity(i, entity.key, entity.label);
+
+      if (entity.skipSync) {
+        console.log(`Skipping objects (${entity.key}) — skipSync: true`);
+        continue;
+      }
 
       const objects = await readGenericObjects(entity, (page, itemsFound) =>
         updatePage(page, itemsFound),
@@ -80,7 +90,7 @@ export async function syncObjects(catalog: Catalog) {
     }
 
     finishSync();
-    console.log(`Object sync finished (${catalog})`);
+    console.log(`Object sync finished (${label})`);
   } catch (err: any) {
     failSync(err?.message ?? String(err));
     throw err;
@@ -100,37 +110,46 @@ export async function syncEvents(catalog: Catalog) {
 
       startEntity(i, entity.key, entity.label);
 
+      if (entity.skipSync) {
+        console.log(`Skipping events (${entity.key}) — skipSync: true`);
+        continue;
+      }
+
       const cursor = getSyncState(eventSyncStateKey(entity));
 
-      const events = await readGenericEvents(
+      let saved = 0;
+
+      // Called every 100 pages (and at the end / on failure) with the events
+      // fetched since the last call, so progress survives a mid-scan error.
+      const saveBatch = async (events: ChainEvent[], endCursor: string | null) => {
+        console.log(`Saving ${events.length} events (${entity.key})`);
+
+        startSaving();
+        await tick();
+
+        for (let j = 0; j < events.length; j++) {
+          saveChainEvent(events[j]);
+
+          if ((j + 1) % SAVE_REPORT_INTERVAL === 0) {
+            updateSaving(saved + j + 1);
+            await tick();
+          }
+        }
+
+        saved += events.length;
+        updateSaving(saved);
+
+        if (endCursor) {
+          setSyncState(eventSyncStateKey(entity), endCursor);
+        }
+      };
+
+      await readGenericEvents(
         entity,
         cursor,
         (page, itemsFound) => updatePage(page, itemsFound),
+        saveBatch,
       );
-
-      console.log(`Saving ${events.length} events (${entity.key})`);
-
-      startSaving();
-      await tick();
-
-      for (let i = 0; i < events.length; i++) {
-        saveChainEvent(events[i]);
-
-        if ((i + 1) % SAVE_REPORT_INTERVAL === 0) {
-          updateSaving(i + 1);
-          await tick();
-        }
-      }
-
-      updateSaving(events.length);
-
-      if (events.length) {
-        const cursor = events[events.length - 1].cursor;
-
-        if (cursor) {
-          setSyncState(eventSyncStateKey(entity), cursor);
-        }
-      }
     }
 
     finishSync();

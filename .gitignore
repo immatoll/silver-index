@@ -26,4 +26,4 @@ discord.md
 *.sw?
 
 #database
-data/silver.db
+data/

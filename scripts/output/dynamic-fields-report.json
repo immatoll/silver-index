@@ -1,0 +1,128 @@
+{
+  "killmail_registry": [
+    {
+      "nameType": "0x0000000000000000000000000000000000000000000000000000000000000002::derived_object::Claimed",
+      "valueType": "0x0000000000000000000000000000000000000000000000000000000000000002::derived_object::ClaimedStatus",
+      "count": 5855,
+      "sampleParentIds": [
+        "0x74fee5f66951f4e6319ff6f5f450ce7f64c31b0943d224d0b755cc638b0860c9"
+      ],
+      "sampleName": {
+        "pos0": "0x60eb63072cb2f916ab5bb138d8cae7110f7879ef38013fa146d59224bd3c5984"
+      },
+      "sampleValue": {
+        "@variant": "Reserved"
+      }
+    }
+  ],
+  "object_registry": [
+    {
+      "nameType": "0x0000000000000000000000000000000000000000000000000000000000000002::derived_object::Claimed",
+      "valueType": "0x0000000000000000000000000000000000000000000000000000000000000002::derived_object::ClaimedStatus",
+      "count": 37539,
+      "sampleParentIds": [
+        "0xf6aed9361acc0d7021672b653ebe9dae45d88e11fecef01cc5434c8f60ae764f"
+      ],
+      "sampleName": {
+        "pos0": "0x1d9f94010d2f2c1df477a16e169fc4fd790da80fdf3ded6015d2d5bfd44b0615"
+      },
+      "sampleValue": {
+        "@variant": "Reserved"
+      }
+    }
+  ],
+  "storage_unit": [
+    {
+      "nameType": "0x0000000000000000000000000000000000000000000000000000000000000002::object::ID",
+      "valueType": "0x8b8a46ed766fa1358ce7c5c51f6a164b13d627a63e45343f69ed0ba0446c1aa1::inventory::Inventory",
+      "count": 121,
+      "sampleParentIds": [
+        "0x003634d5f9bd06bca41030bc02cda7484e242332af923b8217d0ed55e48d7e40",
+        "0x0088e1f5ab4ed986e702dc4957dee93c7de81bccb97041ebe861843ab94e8731"
+      ],
+      "sampleName": "0x46c03482705bb7f55e06c4c14dfa90f52cbba9ad9f2d2e5ffe5fd628a8ad0799",
+      "sampleValue": {
+        "max_capacity": "2000000",
+        "used_capacity": "84290",
+        "items": {
+          "contents": [
+            {
+              "key": "78416",
+              "value": {
+                "tenant": "stillness",
+                "type_id": "78416",
+                "item_id": "0",
+                "volume": "6020",
+                "quantity": 2
+              }
+            },
+            {
+              "key": "78420",
+              "value": {
+                "tenant": "stillness",
+                "type_id": "78420",
+                "item_id": "0",
+                "volume": "3450",
+                "quantity": 1
+              }
+            },
+            {
+              "key": "78417",
+              "value": {
+                "tenant": "stillness",
+                "type_id": "78417",
+                "item_id": "0",
+                "volume": "3450",
+                "quantity": 3
+              }
+            },
+            {
+              "key": "78421",
+              "value": {
+                "tenant": "stillness",
+                "type_id": "78421",
+                "item_id": "0",
+                "volume": "3450",
+                "quantity": 1
+              }
+            },
+            {
+              "key": "77800",
+              "value": {
+                "tenant": "stillness",
+                "type_id": "77800",
+                "item_id": "0",
+                "volume": "100",
+                "quantity": 250
+              }
+            },
+            {
+              "key": "77810",
+              "value": {
+                "tenant": "stillness",
+                "type_id": "77810",
+                "item_id": "0",
+                "volume": "100",
+                "quantity": 300
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "nameType": "0x8b8a46ed766fa1358ce7c5c51f6a164b13d627a63e45343f69ed0ba0446c1aa1::extension_freeze::ExtensionFrozenKey",
+      "valueType": "0x8b8a46ed766fa1358ce7c5c51f6a164b13d627a63e45343f69ed0ba0446c1aa1::extension_freeze::ExtensionFrozen",
+      "count": 1,
+      "sampleParentIds": [
+        "0x069006ccd526a63c01ef3cd1804121d2158727bfc012d1fbd0d6876244725ef8"
+      ],
+      "sampleName": {
+        "dummy_field": false
+      },
+      "sampleValue": {
+        "dummy_field": false
+      }
+    }
+  ]
+}

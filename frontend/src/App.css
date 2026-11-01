@@ -262,6 +262,52 @@ body {
   box-shadow: 0 0 5px 1px rgba(95, 214, 127, 0.5);
 }
 
+/* Marks a function that takes &AdminACL — restricted to the sponsor/admin
+   server, not callable from an ordinary player wallet/PTB (see
+   EntityExplorer.tsx's own tooltip on this tag for why). Distinct hue from
+   both --amber (already used for the function name itself) and --cyan
+   (reads as "granted"/success elsewhere) so it reads as its own warning,
+   not a reused color with a different meaning here. */
+.tag--admin {
+  margin-left: 8px;
+  border-color: rgba(255, 107, 107, 0.45);
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  font-size: 9.5px;
+  padding: 2px 7px;
+}
+
+/* Row of event-struct chips under a function-card's doc text (see
+   FunctionDef.emits's own doc comment in functions.ts) — a function can
+   list several, so this wraps rather than trying to fit them on one
+   line. */
+.function-emits {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.function-emits-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* Distinct hue from --tag--admin/--tag--green so "this function emits X"
+   doesn't read as either a warning or a success state — it's neutral
+   reference information. */
+.tag--event {
+  border-color: rgba(140, 170, 255, 0.4);
+  color: #8caaff;
+  background: rgba(140, 170, 255, 0.1);
+  font-size: 9.5px;
+  padding: 2px 7px;
+}
+
 .dot {
   width: 6px;
   height: 6px;
@@ -1078,4 +1124,15 @@ pre {
   .status .dot {
     animation: none;
   }
+}
+
+.entity-section-title {
+  padding: 8px 14px 6px;
+  background: rgba(255, 150, 64, 0.04);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text-faint);
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 1.5px;
 }

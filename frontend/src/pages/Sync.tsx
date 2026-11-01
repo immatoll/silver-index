@@ -145,6 +145,10 @@ export default function SyncPage() {
                         SYNC WORLD OBJECTS
                     </button>
 
+                    <button onClick={() => sync("world-technical-objects")} disabled={progress.running}>
+                        SYNC WORLD TECHNICAL OBJECTS
+                    </button>
+
                     <button onClick={() => sync("world-events")} disabled={progress.running}>
                         SYNC WORLD EVENTS
                     </button>

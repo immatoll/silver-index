@@ -74,7 +74,7 @@ export function startEntity(entityIndex: number, entityKey: string, entityLabel:
 }
 
 export function updatePage(page: number, itemsFound: number) {
-  state = { ...state, page, itemsFound, updatedAt: Date.now() };
+  state = { ...state, phase: "fetching", page, itemsFound, updatedAt: Date.now() };
 }
 
 export function startSaving() {

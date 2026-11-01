@@ -86,6 +86,13 @@ app.post("/api/sync/world-objects", (req, res) => {
   res.status(result === "busy" ? 409 : 200).json({ ok: result === "started", status: result });
 });
 
+app.post("/api/sync/world-technical-objects", (req, res) => {
+  const result = triggerBackgroundSync("World technical object sync", () =>
+    syncObjects("world", "technical"),
+  );
+  res.status(result === "busy" ? 409 : 200).json({ ok: result === "started", status: result });
+});
+
 app.post("/api/sync/world-events", (req, res) => {
   const result = triggerBackgroundSync("World event sync", () => syncEvents("world"));
   res.status(result === "busy" ? 409 : 200).json({ ok: result === "started", status: result });

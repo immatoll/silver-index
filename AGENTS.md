@@ -3,7 +3,8 @@
 Orientation for anyone (human or agent) working in this codebase. This is
 an indexer + explorer for on-chain data from EVE Frontier's `world`
 package and SilverLink's own extension packages (`silver_gate`,
-`silver_ssu`, `silver_location`). It's a Node/TypeScript backend (Express API + a
+`silver_ssu`, `silver_location`, `silver_toll`, `silver_market`). It's a
+Node/TypeScript backend (Express API + a
 better-sqlite3-backed indexer) with a small React frontend for browsing
 the indexed data. See [`README.md`](README.md) for the user-facing
 overview — this file is for how the pieces fit together and gotchas
@@ -68,6 +69,23 @@ table/reader for a new type; extend the generic path instead.
 `catalog` (`"world" | "silverlink"`) is purely a frontend grouping (two
 tabs) — it doesn't affect how data is fetched or stored.
 
+## Game vs technical objects
+
+Object entities carry an optional `technical: true` flag in
+`entities.ts` — plumbing singletons (admin ACL, configs, registries,
+governor cap) as opposed to real game objects (character, gate,
+killmail, ...). `syncObjects(catalog)` defaults to scope `"game"` and
+skips technical entities; `syncObjects("world", "technical")` (CLI
+`world-technical-objects`, `POST /api/sync/world-technical-objects`,
+its own button on the Sync page) fetches only those. The explorer lists them in a separate TECHNICAL section under the
+game objects. Mark new config/registry-style
+objects `technical: true`.
+
+Event entities carry `groups: string[]` (origin object/module, e.g.
+`["Character", "Assembly"]` for `MetadataChangedEvent`); the explorer
+groups the event list by it, and a multi-origin event appears under each
+group. Set `groups` on every new event entry.
+
 ## Sync model
 
 - **Objects** (`getGenericObjects.ts` + `syncObjects`): full re-scan every
@@ -77,7 +95,11 @@ tabs) — it doesn't affect how data is fetched or stored.
 - **Events** (`getGenericEvents.ts` + `syncEvents`): incremental —
   the last page's `endCursor` is persisted per entity in `sync_state`
   (`event_<entity.key>`) and reused as `after` on the next run, so a
-  re-sync only fetches new events. Inserted with `(digest,
+  re-sync only fetches new events. Events are checkpointed every 100
+  pages (`CHECKPOINT_PAGES` in `getGenericEvents.ts`): the batch is saved and
+  the cursor persisted mid-scan (and on a failed page), so a rate-limit error
+  deep into a scan resumes from the last checkpoint instead of restarting.
+  Inserted with `(digest,
   sequence_number)` as the primary key and `ON CONFLICT DO NOTHING` —
   **one transaction can emit several events of the same type** (e.g. a
   `take_many` loop), all sharing one `digest`, so `sequence_number` is

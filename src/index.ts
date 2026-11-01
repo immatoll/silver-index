@@ -8,6 +8,8 @@ async function main() {
 
   if (mode === "world-objects") {
     await syncObjects("world");
+  } else if (mode === "world-technical-objects") {
+    await syncObjects("world", "technical");
   } else if (mode === "world-events") {
     await syncEvents("world");
   } else if (mode === "silverlink-objects") {
@@ -16,7 +18,7 @@ async function main() {
     await syncEvents("silverlink");
   } else {
     console.log(
-      "Usage: tsx src/index.ts <world-objects|world-events|silverlink-objects|silverlink-events>",
+      "Usage: tsx src/index.ts <world-objects|world-technical-objects|world-events|silverlink-objects|silverlink-events>",
     );
   }
 
